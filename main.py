@@ -110,3 +110,27 @@ X_train, X_test, Y_train, Y_test = train_test_split(X_train, Y_train, test_size=
 
 Y_train_new = [labels.index(i) for i in Y_train]
 Y_train = tf.keras.utils.to_categorically(Y_train_new, num_classes=15)
+
+# Define a function to build the model for Keras Tuner
+def build_model(hp):
+model = Sequential()
+model.add(Conv2D(hp.Int('conv_1_filter', min_value=32, max_value=128, step=16),
+(3, 3), activation='relu', input_shape=(150, 150, 3)))
+model.add(Conv2D(hp. Int('conv_2_filter', min_value=32, max_value=128, step=16),
+(3, 3), activation='relu' ) )
+model.add(MaxPooling2D(2, 2))
+model.add(Dropout(hp.Float('dropout_1', min_value=0.1, max_value=0.5, step=0.05)))
+model.add(Conv2D(hp.Int('conv_3_filter', min_value=64, max_value=256, step=32),
+(3, 3), activation='relu' ))
+model.add(Conv2D(hp.Int('conv_4_filter', min_value=64, max_value=256, step=32),
+(3, 3), activation='relu' ) )
+model.add(MaxPooling2D(2, 2))
+model.add(Dropout(hp.Float('dropout_2', min_value=0.1, max_value=0.5, step=0.05)))
+model.add(Flatten())
+model.add(Dense(hp.Int('dense_1_units', min_value=128, max_value=512, step=64),
+activation='relu' ) )
+model.add(Dropout(hp.Float('dropout_3', min_value=0.1, max_value=0.5, step=0.05)))
+model.add(Dense(15, activation='softmax' )) # Updated to 15 output classes
+
+model. compile(optimizer='adam', loss='categorical_crossentropy' , metrics=['accuracy' ])
+return model
